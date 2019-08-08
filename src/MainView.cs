@@ -33,7 +33,7 @@ using Decal.Adapter.Wrappers;
 using System.Timers;
 using System.IO;
 
-namespace Deadeye.AutoFletch
+namespace ExamplePlugin
 {
     internal static class MainView
     {
@@ -48,7 +48,7 @@ namespace Deadeye.AutoFletch
         public static void ViewInit()
         {
             //Create view here
-            View = MyClasses.MetaViewWrappers.ViewSystemSelector.CreateViewResource(PluginCore.MyHost, " Deadeye.AutoFletch.ViewXML.testlayout.xml");
+            View = MyClasses.MetaViewWrappers.ViewSystemSelector.CreateViewResource(PluginCore.MyHost, "ExamplePlugin.ViewXML.testlayout.xml");
             bSelectCraftOutput = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftOutput"];
             bSelectCraftInputA = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputA"];
             bSelectCraftInputB = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputB"];
@@ -88,7 +88,7 @@ namespace Deadeye.AutoFletch
                 //Continue to read until you reach end of file
                 while (line != null)
                 {
-                    parseConfigLine(line);                    
+                    parseConfigLine(line);
                     line = sr.ReadLine();
                 }
 
@@ -135,7 +135,8 @@ namespace Deadeye.AutoFletch
                 writer.WriteLine("low " + txtLow.Text);
                 writer.Close();
 
-            } catch
+            }
+            catch
             {
 
             }
@@ -164,6 +165,12 @@ namespace Deadeye.AutoFletch
         {
             Decal.Adapter.Wrappers.WorldObject selection = PluginCore.MyCore.WorldFilter[PluginCore.MyHost.Actions.CurrentSelection];
             if (selection == null) { PluginCore.Chat("Nothing selected."); return ""; }
+            PluginCore.Chat(selection.Name);
+            PluginCore.Chat("Container: " + selection.Container);
+            PluginCore.Chat("Behavior: " + selection.Behavior);
+            PluginCore.Chat("Category: " + selection.Category);
+            PluginCore.Chat("Icon: " + selection.Icon);            
+            PluginCore.Chat("Equipped slot: " + (selection.Values(LongValueKey.EquippedSlots)));
             return selection.Name;
         }
 
@@ -220,7 +227,7 @@ namespace Deadeye.AutoFletch
             PluginCore.MyHost.Actions.ApplyItem(guidA, guidB);
         }
 
-        static bool IsSupplyLow(string item_name, int min_count)
+        static bool IsSupplyLow(string item_name, int min_count, bool onlyEquipped)
         {
             int supply = 0;
             WorldObjectCollection inventory = PluginCore.MyCore.WorldFilter.GetInventory();
@@ -228,8 +235,10 @@ namespace Deadeye.AutoFletch
             {
                 if (worldObject.Name.Equals(item_name))
                 {
-                    PluginCore.MyHost.Actions.SelectItem(worldObject.Id);
-                    supply += PluginCore.MyHost.Actions.MaxSelectedStackCount;
+                    if ((worldObject.Values(LongValueKey.EquippedSlots) > 0) || !onlyEquipped)
+                    {
+                        supply += worldObject.Values(LongValueKey.StackCount, 0);
+                    }
                 }
             }
             return supply < min_count;
@@ -247,9 +256,34 @@ namespace Deadeye.AutoFletch
         {
             string crafting_name = txtCraftOutput.Text;
             int crafting_min_count = sldLow.Position;
-            if (IsSupplyLow(crafting_name, crafting_min_count))
+            if (IsSupplyLow(crafting_name, crafting_min_count, false))
             {
                 MakeArrows();
+            }
+            if (IsAmmoLow())
+            {
+                PluginCore.Chat("Ammo low (<30), equipping more.");
+                EquipAmmo();
+            }
+        }
+
+        static bool IsAmmoLow()
+        {
+            string crafting_name = txtCraftOutput.Text;
+            int crafting_min_count = sldLow.Position;
+            return IsSupplyLow(crafting_name, 30, true);
+        }
+
+        static void EquipAmmo()
+        {
+            string crafting_name = txtCraftOutput.Text;
+            WorldObjectCollection inventory = PluginCore.MyCore.WorldFilter.GetInventory();
+            foreach (WorldObject worldObject in inventory)
+            {
+                if (worldObject.Name.Equals(crafting_name) && (worldObject.Values(LongValueKey.EquippedSlots) == 0 ))
+                {
+                    PluginCore.MyHost.Actions.UseItem(worldObject.Id, 0);
+                }
             }
         }
 
@@ -260,11 +294,11 @@ namespace Deadeye.AutoFletch
             aTimer = new System.Timers.Timer();
             aTimer.Enabled = false;
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            aTimer.Interval = 5000;
+            aTimer.Interval = 10000;
         }
 
         static void StartAutoFletcher()
-        {            
+        {
             aTimer.Start();
             aTimer.Enabled = true;
         }

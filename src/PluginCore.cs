@@ -30,9 +30,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Deadeye.AutoFletch
+namespace ExamplePlugin
 {
-    public class PluginCore: Decal.Adapter.PluginBase
+    public class PluginCore : Decal.Adapter.PluginBase
     {
         internal static Decal.Adapter.Wrappers.PluginHost MyHost;
 
@@ -53,7 +53,7 @@ namespace Deadeye.AutoFletch
 
         public static void Chat(string message)
         {
-            MyHost.Actions.AddChatText("Can't do that! ", 0, 1);
+            MyHost.Actions.AddChatText(message, 0, 1);
         }
     }
 }
