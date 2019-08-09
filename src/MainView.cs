@@ -48,30 +48,38 @@ namespace ExamplePlugin
         public static void ViewInit()
         {
             //Create view here
-            View = MyClasses.MetaViewWrappers.ViewSystemSelector.CreateViewResource(PluginCore.MyHost, "ExamplePlugin.ViewXML.testlayout.xml");
-            bSelectCraftOutput = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftOutput"];
-            bSelectCraftInputA = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputA"];
-            bSelectCraftInputB = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputB"];
-            bToggleStartStop = (MyClasses.MetaViewWrappers.IButton)View["bToggleStartStop"];
+            try
+            {
+                View = MyClasses.MetaViewWrappers.ViewSystemSelector.CreateViewResource(PluginCore.MyHost, "ExamplePlugin.ViewXML.testlayout.xml");
+                bSelectCraftOutput = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftOutput"];
+                bSelectCraftInputA = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputA"];
+                bSelectCraftInputB = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputB"];
+                bToggleStartStop = (MyClasses.MetaViewWrappers.IButton)View["bToggleStartStop"];
 
-            txtCraftOutput = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftOutput"];
-            txtLow = (MyClasses.MetaViewWrappers.ITextBox)View["txtLow"];
-            txtCraftInputA = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftInputA"];
-            txtCraftInputB = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftInputB"];
+                txtCraftOutput = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftOutput"];
+                txtLow = (MyClasses.MetaViewWrappers.ITextBox)View["txtLow"];
+                txtCraftInputA = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftInputA"];
+                txtCraftInputB = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftInputB"];
 
-            sldLow = (MyClasses.MetaViewWrappers.ISlider)View["sldLow"];
-            sldLow.Change += new EventHandler<MyClasses.MetaViewWrappers.MVIndexChangeEventArgs>(sldLow_Change);
+                sldLow = (MyClasses.MetaViewWrappers.ISlider)View["sldLow"];
+                sldLow.Change += new EventHandler<MyClasses.MetaViewWrappers.MVIndexChangeEventArgs>(sldLow_Change);
 
-            bSelectCraftOutput.Hit += new EventHandler(bSelectCraftOutput_Hit);
-            bSelectCraftInputA.Hit += new EventHandler(bSelectCraftInputA_Hit);
-            bSelectCraftInputB.Hit += new EventHandler(bSelectCraftInputB_Hit);
+                bSelectCraftOutput.Hit += new EventHandler(bSelectCraftOutput_Hit);
+                bSelectCraftInputA.Hit += new EventHandler(bSelectCraftInputA_Hit);
+                bSelectCraftInputB.Hit += new EventHandler(bSelectCraftInputB_Hit);
 
-            bToggleStartStop.Hit += new EventHandler(bToggleStartStop_Hit);
+                bToggleStartStop.Hit += new EventHandler(bToggleStartStop_Hit);
 
-            loadConfig();
-            initTimer();
+                loadConfig();
+                initTimer();
 
-            if (IsEnabled) StartAutoFletcher();
+                if (IsEnabled) StartAutoFletcher();
+            }
+            catch
+            {
+                try { PluginCore.Chat("Unknown issue starting"); }
+                catch { }
+            }
         }
 
         public static void loadConfig()
@@ -166,27 +174,26 @@ namespace ExamplePlugin
             Decal.Adapter.Wrappers.WorldObject selection = PluginCore.MyCore.WorldFilter[PluginCore.MyHost.Actions.CurrentSelection];
             if (selection == null) { PluginCore.Chat("Nothing selected."); return ""; }
             PluginCore.Chat(selection.Name);
-            PluginCore.Chat("Container: " + selection.Container);
-            PluginCore.Chat("Behavior: " + selection.Behavior);
-            PluginCore.Chat("Category: " + selection.Category);
-            PluginCore.Chat("Icon: " + selection.Icon);            
-            PluginCore.Chat("Equipped slot: " + (selection.Values(LongValueKey.EquippedSlots)));
             return selection.Name;
         }
 
         static void bSelectCraftInputA_Hit(object sender, EventArgs e)
         {
-            txtCraftInputA.Text = CurrentSelectionName();
+
+            try { txtCraftInputA.Text = CurrentSelectionName(); }
+            catch { }
         }
 
         static void bSelectCraftInputB_Hit(object sender, EventArgs e)
         {
-            txtCraftInputB.Text = CurrentSelectionName();
+            try { txtCraftInputB.Text = CurrentSelectionName(); }
+            catch { }
         }
 
         static void bSelectCraftOutput_Hit(object sender, EventArgs e)
         {
-            txtCraftOutput.Text = CurrentSelectionName();
+            try { txtCraftOutput.Text = CurrentSelectionName(); }
+            catch { }
         }
 
         static void bToggleStartStop_Hit(object sender, EventArgs e)
@@ -305,7 +312,21 @@ namespace ExamplePlugin
 
         private static void OnTimedEvent(object sender, ElapsedEventArgs e)
         {
-            MakeIfLow();
+            try
+            {
+                MakeIfLow();
+            }
+            catch
+            {
+                try
+                {
+                    PluginCore.Chat("Unknown Error!");
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         static void StopAutoFletcher()
@@ -316,7 +337,11 @@ namespace ExamplePlugin
 
         static void sldLow_Change(object sender, EventArgs e)
         {
-            txtLow.Text = sldLow.Position.ToString();
+            try
+            {
+                txtLow.Text = sldLow.Position.ToString();
+            }
+            catch { }
         }
     }
 }
