@@ -168,7 +168,7 @@ namespace ExamplePlugin
 
         public static void ViewDestroy()
         {
-            saveSettings();
+            //saveSettings();
 
             Deadeye.RemoveEventHandlers();
 
