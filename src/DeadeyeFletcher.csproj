@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExamplePlugin</RootNamespace>
-    <AssemblyName>ExamplePlugin</AssemblyName>
+    <AssemblyName>DeadeyeFletcher</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -80,9 +80,13 @@
     <Compile Include="..\..\Wrapper_MyHuds.cs">
       <Link>Wrapper_MyHuds.cs</Link>
     </Compile>
+    <Compile Include="Deadeye.cs" />
     <Compile Include="MainView.cs" />
     <Compile Include="PluginCore.cs" />
+    <Compile Include="PostMsg.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="User32.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ViewXML\testlayout.xml" />

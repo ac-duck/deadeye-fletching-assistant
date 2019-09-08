@@ -26,12 +26,14 @@
 //  THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
+using Decal.Adapter;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ExamplePlugin
 {
+    [FriendlyName("DeadeyeFletcher")]
     public class PluginCore : Decal.Adapter.PluginBase
     {
         internal static Decal.Adapter.Wrappers.PluginHost MyHost;
@@ -47,8 +49,19 @@ namespace ExamplePlugin
 
         protected override void Shutdown()
         {
-            MainView.ViewDestroy();
-            MyHost = null;
+            try
+            {
+                MainView.ViewDestroy();
+                MyHost = null;
+            }
+            catch
+            {
+                try
+                {
+                    Chat("DeadeyeFletcher: Unknown Error during shutdown.");
+                }
+                catch { }
+            }
         }
 
         public static void Chat(string message)

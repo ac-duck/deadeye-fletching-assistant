@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ExamplePlugin")]
+[assembly: AssemblyTitle("DeadeyeFletcher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("VirindiPlugins")]
-[assembly: AssemblyProduct("ExamplePlugin")]
-[assembly: AssemblyCopyright("Copyright © VirindiPlugins 2009")]
+[assembly: AssemblyCompany("Sienk")]
+[assembly: AssemblyProduct("DeadeyeFletcher")]
+[assembly: AssemblyCopyright("Copyright © Sienk 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("dc89d755-5664-4f3a-85b2-262cb833bf26")]
+[assembly: Guid("acac1234-5664-4f3a-85b2-262cb833bf29")]
 
 // Version information for an assembly consists of the following four values:
 //

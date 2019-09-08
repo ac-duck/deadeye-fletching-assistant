@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<view icon="26075" title="Deadeye Auto-Fletch" width="400" height="250">
+<view icon="8713" title="Deadeye Auto-Fletch" width="400" height="280">
 		<control progid="DecalControls.FixedLayout" clipped="">
 			
       <control progid="DecalControls.PushButton" name="bSelectCraftOutput" left="8" top="20" width="80" height="24" text="Select Output"/>
 			<control progid="DecalControls.Edit" name="txtCraftOutput" left="96" top="24" width="200" height="16" imageportalsrc="4726" text="Greater Fire Arrows"/>
-			
-      <control progid="DecalControls.Slider" name="sldLow" left="8" top="52" width="216" height="16" minimum="0" maximum="750" textcolor="0" vertical="0"/>
-      <control progid="DecalControls.Edit" name="txtLow" left="242" top="52" width="60" height="16" imageportalsrc="4726" text="150"/>
+
+      <control progid="DecalControls.StaticText" name="txtMinimum" left="28" top="48" width="64" height="16" imageportalsrc="4726" text="Minimum: "/>
+      <control progid="DecalControls.Slider" name="sldLow" left="96" top="48" width="154" height="16" minimum="0" maximum="750" textcolor="0" vertical="0"/>
+      <control progid="DecalControls.StaticText" name="txtLow" left="250" top="48" width="60" height="16" imageportalsrc="4726" text="150"/>
 
       <control progid="DecalControls.PushButton" name="bSelectCraftInputA" left="8" top="80" width="80" height="24" text="Select In1"/>
       <control progid="DecalControls.Edit" name="txtCraftInputA" left="96" top="84" width="300" height="16" imageportalsrc="4726" text="Wrapped Bundle of Greater Fire Arrowheads"/>
@@ -14,8 +15,13 @@
       <control progid="DecalControls.PushButton" name="bSelectCraftInputB" left="8" top="110" width="80" height="24" text="Select In2"/>
       <control progid="DecalControls.Edit" name="txtCraftInputB" left="96" top="114" width="300" height="16" imageportalsrc="4726" text="Wrapped Bundle of Arrowshafts"/>
 
-
       <control progid="DecalControls.PushButton" name="bToggleStartStop" left="60" top="160" width="80" height="34" text="Begin!"/>
+
+      <control progid="DecalControls.Checkbox" name="chkStartOnLogin" left="160" top="155" width="220" height="18" text="Enable Auto-Fletch on Login" checked="true"/>
+      <control progid="DecalControls.Checkbox" name="chkLifetankOnLogin" left="160" top="175" width="220" height="18" text="LifeTank on Login (Ctrl+F1)" checked="true"/>
+      
+      <control progid="DecalControls.StaticText" name="staticTxtCommand" left="160" top="195" width="150" height="18" imageportalsrc="4726" text="Command on Login:"/>
+      <control progid="DecalControls.Edit" name="txtCommandOnLogin" left="160" top="215" width="200" height="18" imageportalsrc="4726" text="/vt start"/>
       
 		</control>
 

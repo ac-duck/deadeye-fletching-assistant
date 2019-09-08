@@ -32,6 +32,7 @@ using System.Text;
 using Decal.Adapter.Wrappers;
 using System.Timers;
 using System.IO;
+using MyClasses.MetaViewWrappers;
 
 namespace ExamplePlugin
 {
@@ -40,16 +41,20 @@ namespace ExamplePlugin
         #region Auto-generated view code
         static MyClasses.MetaViewWrappers.IView View;
         static MyClasses.MetaViewWrappers.IButton bSelectCraftOutput, bSelectCraftInputA, bSelectCraftInputB, bToggleStartStop;
-        static MyClasses.MetaViewWrappers.ITextBox txtCraftOutput, txtLow, txtCraftInputA, txtCraftInputB;
+        static MyClasses.MetaViewWrappers.ITextBox txtCraftOutput, txtCraftInputA, txtCraftInputB, txtCommandOnLogin;
+        static MyClasses.MetaViewWrappers.IStaticText txtLow;
         static MyClasses.MetaViewWrappers.ISlider sldLow;
+        static MyClasses.MetaViewWrappers.ICheckBox chkStartOnLogin, chkLifetankOnLogin;
 
         static bool IsEnabled = false;
 
+        static Settings DeadeyeSettings = new Settings("def.config");
+
         public static void ViewInit()
         {
-            //Create view here
             try
             {
+                Deadeye.PrintMessageToWindow("Deadeye Starting!");
                 View = MyClasses.MetaViewWrappers.ViewSystemSelector.CreateViewResource(PluginCore.MyHost, "ExamplePlugin.ViewXML.testlayout.xml");
                 bSelectCraftOutput = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftOutput"];
                 bSelectCraftInputA = (MyClasses.MetaViewWrappers.IButton)View["bSelectCraftInputA"];
@@ -57,9 +62,13 @@ namespace ExamplePlugin
                 bToggleStartStop = (MyClasses.MetaViewWrappers.IButton)View["bToggleStartStop"];
 
                 txtCraftOutput = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftOutput"];
-                txtLow = (MyClasses.MetaViewWrappers.ITextBox)View["txtLow"];
+                txtLow = (MyClasses.MetaViewWrappers.IStaticText)View["txtLow"];
                 txtCraftInputA = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftInputA"];
                 txtCraftInputB = (MyClasses.MetaViewWrappers.ITextBox)View["txtCraftInputB"];
+
+                txtCommandOnLogin = (MyClasses.MetaViewWrappers.ITextBox)View["txtCommandOnLogin"];
+                chkStartOnLogin = (MyClasses.MetaViewWrappers.ICheckBox)View["chkStartOnLogin"];
+                chkLifetankOnLogin = (MyClasses.MetaViewWrappers.ICheckBox)View["chkLifetankOnLogin"];
 
                 sldLow = (MyClasses.MetaViewWrappers.ISlider)View["sldLow"];
                 sldLow.Change += new EventHandler<MyClasses.MetaViewWrappers.MVIndexChangeEventArgs>(sldLow_Change);
@@ -68,91 +77,100 @@ namespace ExamplePlugin
                 bSelectCraftInputA.Hit += new EventHandler(bSelectCraftInputA_Hit);
                 bSelectCraftInputB.Hit += new EventHandler(bSelectCraftInputB_Hit);
 
+                chkLifetankOnLogin.Change += ChkLifetankOnLogin_Change;
+                chkStartOnLogin.Change += ChkStartOnLogin_Change;
+                txtCommandOnLogin.Change += TxtCommandOnLogin_Change;
+
                 bToggleStartStop.Hit += new EventHandler(bToggleStartStop_Hit);
 
                 loadConfig();
+
+                IsEnabled = DeadeyeSettings.startThisOnLogin;
+
+                Deadeye.AddEventHandlers(DeadeyeSettings.startLtOnLogin, DeadeyeSettings.startCmdOnLogin);
+
                 initTimer();
 
                 if (IsEnabled) StartAutoFletcher();
             }
             catch
             {
-                try { PluginCore.Chat("Unknown issue starting"); }
-                catch { }
+                Deadeye.PrintMessageToWindow("Unknown issue starting");
             }
+        }
+
+
+        private static void TxtCommandOnLogin_Change(object sender, MyClasses.MetaViewWrappers.MVTextBoxChangeEventArgs e)
+        {
+            saveSettings();
+        }
+
+        private static void ChkStartOnLogin_Change(object sender, MyClasses.MetaViewWrappers.MVCheckBoxChangeEventArgs e)
+        {
+            saveSettings();
+        }
+
+        private static void ChkLifetankOnLogin_Change(object sender, MyClasses.MetaViewWrappers.MVCheckBoxChangeEventArgs e)
+        {
+            saveSettings();
         }
 
         public static void loadConfig()
         {
-            String line;
-            try
-            {
-                //Pass the file path and file name to the StreamReader constructor
-                StreamReader sr = new StreamReader("def.config");
+            DeadeyeSettings.load();
 
-                //Read the first line of text
-                line = sr.ReadLine();
-
-                //Continue to read until you reach end of file
-                while (line != null)
-                {
-                    parseConfigLine(line);
-                    line = sr.ReadLine();
-                }
-
-                //close the file
-                sr.Close();
-                Console.ReadLine();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception: " + e.Message);
-            }
+            txtCraftInputA.Text = DeadeyeSettings.inputA;
+            txtCraftInputB.Text = DeadeyeSettings.inputB;
+            txtCraftOutput.Text = DeadeyeSettings.craftOutput;
+            txtLow.Text = DeadeyeSettings.low.ToString();
+            sldLow.Position = DeadeyeSettings.low;
+            chkLifetankOnLogin.Checked = DeadeyeSettings.startLtOnLogin;
+            chkStartOnLogin.Checked = DeadeyeSettings.startThisOnLogin;
+            txtCommandOnLogin.Text = DeadeyeSettings.startCmdOnLogin;
         }
 
-        public static void parseConfigLine(string line)
+        private static string GetTextFromTextBox(ITextBox txtBox)
         {
-            string[] parts = line.Split(' ');
-            switch (parts[0])
-            {
-                case "a":
-                    txtCraftInputA.Text = line.Substring(1).Trim();
-                    return;
-                case "b":
-                    txtCraftInputB.Text = line.Substring(1).Trim();
-                    return;
-                case "c":
-                    txtCraftOutput.Text = line.Substring(1).Trim();
-                    return;
-                case "low":
-                    txtLow.Text = parts[1];
-                    sldLow.Position = int.Parse(parts[1]);
-                    return;
-            }
+            return txtBox == null ? "" : txtBox.Text.Trim();
         }
 
-        public static void saveConfig()
+        public static void saveSettings()
         {
-            try
+            if (txtCraftInputA != null)
             {
-                //Pass the file path and file name to the StreamReader constructor
-                StreamWriter writer = new StreamWriter("def.config", false);
-                writer.WriteLine("a " + txtCraftInputA.Text);
-                writer.WriteLine("b " + txtCraftInputB.Text);
-                writer.WriteLine("c " + txtCraftOutput.Text);
-                writer.WriteLine("low " + txtLow.Text);
-                writer.Close();
-
+                DeadeyeSettings.inputA = GetTextFromTextBox(txtCraftInputA);
             }
-            catch
+            if (txtCraftInputB != null) {
+                DeadeyeSettings.inputB = GetTextFromTextBox(txtCraftInputB);
+            }
+            if (txtCraftOutput != null) {
+                DeadeyeSettings.craftOutput = GetTextFromTextBox(txtCraftOutput);
+            }
+            if (sldLow != null)
             {
-
+                DeadeyeSettings.low = sldLow.Position;
             }
+            if (chkLifetankOnLogin != null)
+            {
+                DeadeyeSettings.startLtOnLogin = chkLifetankOnLogin.Checked;
+            }
+            if(txtCommandOnLogin != null)
+            {
+                DeadeyeSettings.startCmdOnLogin = GetTextFromTextBox(txtCommandOnLogin);
+            }
+            if (chkStartOnLogin != null)
+            {
+                DeadeyeSettings.startThisOnLogin = chkStartOnLogin.Checked;
+            }
+
+            DeadeyeSettings.save();
         }
 
         public static void ViewDestroy()
         {
-            saveConfig();
+            saveSettings();
+
+            Deadeye.RemoveEventHandlers();
 
             bSelectCraftOutput = null;
             bSelectCraftInputA = null;
@@ -168,144 +186,78 @@ namespace ExamplePlugin
         }
         #endregion Auto-generated view code
 
-
-        static string CurrentSelectionName()
-        {
-            Decal.Adapter.Wrappers.WorldObject selection = PluginCore.MyCore.WorldFilter[PluginCore.MyHost.Actions.CurrentSelection];
-            if (selection == null) { PluginCore.Chat("Nothing selected."); return ""; }
-            PluginCore.Chat(selection.Name);
-            return selection.Name;
-        }
-
+        
         static void bSelectCraftInputA_Hit(object sender, EventArgs e)
-        {
-
-            try { txtCraftInputA.Text = CurrentSelectionName(); }
+        {     
+            try {
+                txtCraftInputA.Text = Deadeye.CurrentSelectionName();
+                saveSettings();
+            }
             catch { }
         }
 
         static void bSelectCraftInputB_Hit(object sender, EventArgs e)
         {
-            try { txtCraftInputB.Text = CurrentSelectionName(); }
+            try {
+                txtCraftInputB.Text = Deadeye.CurrentSelectionName();
+                saveSettings();
+            }
             catch { }
         }
 
         static void bSelectCraftOutput_Hit(object sender, EventArgs e)
         {
-            try { txtCraftOutput.Text = CurrentSelectionName(); }
+            try {
+                txtCraftOutput.Text = Deadeye.CurrentSelectionName();
+                saveSettings();
+            }
+            catch { }
+        }
+        static void sldLow_Change(object sender, EventArgs e)
+        {
+            try
+            {
+                txtLow.Text = sldLow.Position.ToString();
+                //saveSettings();
+            }
             catch { }
         }
 
         static void bToggleStartStop_Hit(object sender, EventArgs e)
         {
-            if (IsEnabled)
+            try
             {
-                bToggleStartStop.Text = "Start";
-                StopAutoFletcher();
-                IsEnabled = false;
-            }
-            else
-            {
-                bToggleStartStop.Text = "Stop";
-                StartAutoFletcher();
-                IsEnabled = true;
-            }
-        }
-
-        static void ApplyItemByNames(string itemA, string itemB)
-        {
-            int guidA = 0, guidB = 0;
-            WorldObjectCollection inventory = PluginCore.MyCore.WorldFilter.GetInventory();
-            foreach (WorldObject worldObject in inventory)
-            {
-                if (worldObject.Name.Equals(itemA))
+                if (IsEnabled)
                 {
-                    guidA = worldObject.Id;
+                    StopAutoFletcher();
                 }
-                if (worldObject.Name.Equals(itemB))
+                else
                 {
-                    guidB = worldObject.Id;
-                }
-                if (guidA != 0 && guidB != 0)
-                {
-                    break;
+                    StartAutoFletcher();
                 }
             }
-            PluginCore.MyHost.Actions.ApplyItem(guidA, guidB);
+            catch { }
         }
 
-        static bool IsSupplyLow(string item_name, int min_count, bool onlyEquipped)
-        {
-            int supply = 0;
-            WorldObjectCollection inventory = PluginCore.MyCore.WorldFilter.GetInventory();
-            foreach (WorldObject worldObject in inventory)
-            {
-                if (worldObject.Name.Equals(item_name))
-                {
-                    if ((worldObject.Values(LongValueKey.EquippedSlots) > 0) || !onlyEquipped)
-                    {
-                        supply += worldObject.Values(LongValueKey.StackCount, 0);
-                    }
-                }
-            }
-            return supply < min_count;
-        }
-
-        static void MakeArrows()
-        {
-            string a = txtCraftInputA.Text;
-            string b = txtCraftInputB.Text;
-            PluginCore.Chat("Supply low. Applying <" + a + "> to <" + b + ">");
-            ApplyItemByNames(a, b);
-        }
-
-        static void MakeIfLow()
-        {
-            string crafting_name = txtCraftOutput.Text;
-            int crafting_min_count = sldLow.Position;
-            if (IsSupplyLow(crafting_name, crafting_min_count, false))
-            {
-                MakeArrows();
-            }
-            if (IsAmmoLow())
-            {
-                PluginCore.Chat("Ammo low (<30), equipping more.");
-                EquipAmmo();
-            }
-        }
-
-        static bool IsAmmoLow()
-        {
-            string crafting_name = txtCraftOutput.Text;
-            int crafting_min_count = sldLow.Position;
-            return IsSupplyLow(crafting_name, 30, true);
-        }
-
-        static void EquipAmmo()
-        {
-            string crafting_name = txtCraftOutput.Text;
-            WorldObjectCollection inventory = PluginCore.MyCore.WorldFilter.GetInventory();
-            foreach (WorldObject worldObject in inventory)
-            {
-                if (worldObject.Name.Equals(crafting_name) && (worldObject.Values(LongValueKey.EquippedSlots) == 0 ))
-                {
-                    PluginCore.MyHost.Actions.UseItem(worldObject.Id, 0);
-                }
-            }
-        }
 
         private static System.Timers.Timer aTimer;
+
+        private const int ONE_SECOND = 1000;
 
         static void initTimer()
         {
             aTimer = new System.Timers.Timer();
             aTimer.Enabled = false;
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            aTimer.Interval = 10000;
+            aTimer.Interval = 15*ONE_SECOND;
         }
 
         static void StartAutoFletcher()
         {
+            Deadeye.PrintMessageToWindow("Auto-fletching enabled!");
+            bToggleStartStop.Text = "Stop";
+            IsEnabled = true;
+
             aTimer.Start();
             aTimer.Enabled = true;
         }
@@ -314,18 +266,11 @@ namespace ExamplePlugin
         {
             try
             {
-                MakeIfLow();
+                Deadeye.MakeIfLow(txtCraftOutput.Text, sldLow.Position, txtCraftInputA.Text, txtCraftInputB.Text);
             }
             catch
             {
-                try
-                {
-                    PluginCore.Chat("Unknown Error!");
-                }
-                catch
-                {
-
-                }
+                Deadeye.PrintMessageToWindow("Unknown Error!");
             }
         }
 
@@ -333,15 +278,9 @@ namespace ExamplePlugin
         {
             aTimer.Stop();
             aTimer.Enabled = false;
+            bToggleStartStop.Text = "Start";
+            IsEnabled = false;
         }
-
-        static void sldLow_Change(object sender, EventArgs e)
-        {
-            try
-            {
-                txtLow.Text = sldLow.Position.ToString();
-            }
-            catch { }
-        }
+        
     }
 }
