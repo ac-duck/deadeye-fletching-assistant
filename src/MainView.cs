@@ -168,6 +168,8 @@ namespace ExamplePlugin
 
         public static void ViewDestroy()
         {
+            aTimer.Elapsed -= new ElapsedEventHandler(OnTimedEvent);
+            StopAutoFletcher();
             //saveSettings();
 
             Deadeye.RemoveEventHandlers();
