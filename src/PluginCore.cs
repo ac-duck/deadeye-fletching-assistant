@@ -60,9 +60,9 @@ namespace ExamplePlugin
             }
         }
 
-        public static void Chat(string message)
+        public static void Print(string message)
         {
-            MyHost.Actions.AddChatText(message, 0, 1);
+            Deadeye.PrintMessageToWindow(message);
         }
     }
 }

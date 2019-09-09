@@ -139,7 +139,7 @@ namespace ExamplePlugin
                     PrintMessageToWindow("Nothing selected.");
                     return "";
                 }
-                PluginCore.Chat("Selected: " + selection.Name);
+                PrintMessageToWindow("Selected: " + selection.Name);
                 return selection.Name;
             }
             catch { return "Error"; }
