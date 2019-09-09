@@ -81,6 +81,8 @@ namespace ExamplePlugin
                 chkStartOnLogin.Change += ChkStartOnLogin_Change;
                 txtCommandOnLogin.Change += TxtCommandOnLogin_Change;
 
+                PluginCore.MyCore.CharacterFilter.Logoff += CharacterFilter_Logoff;
+
                 bToggleStartStop.Hit += new EventHandler(bToggleStartStop_Hit);
 
                 loadConfig();
@@ -99,6 +101,16 @@ namespace ExamplePlugin
             }
         }
 
+        private static void CharacterFilter_Logoff(object sender, LogoffEventArgs e)
+        {
+            PluginCore.MyCore.CharacterFilter.Logoff -= CharacterFilter_Logoff;
+            saveSettings();
+            StopAutoFletcher();
+            aTimer.Elapsed -= new ElapsedEventHandler(OnTimedEvent);
+            aTimer = null;
+            Deadeye.RemoveEventHandlers();
+            Deadeye.PrintMessageToWindow("Log off detected!");
+        }
 
         private static void TxtCommandOnLogin_Change(object sender, MyClasses.MetaViewWrappers.MVTextBoxChangeEventArgs e)
         {
@@ -168,12 +180,6 @@ namespace ExamplePlugin
 
         public static void ViewDestroy()
         {
-            aTimer.Elapsed -= new ElapsedEventHandler(OnTimedEvent);
-            StopAutoFletcher();
-            //saveSettings();
-
-            Deadeye.RemoveEventHandlers();
-
             bSelectCraftOutput = null;
             bSelectCraftInputA = null;
             bSelectCraftInputB = null;

@@ -27,7 +27,7 @@ namespace ExamplePlugin
 
         private static void CharacterFilter_LoginComplete(object sender, EventArgs e)
         {
-            PrintMessageToWindow("Deadeye: Logged In!");
+            PrintMessageToWindow("Logged In!");
 
             if (start_with_lifetank)
             {
@@ -43,7 +43,7 @@ namespace ExamplePlugin
 
             if (!String.IsNullOrEmpty(start_cmd))
             {
-                PrintMessageToWindow("Deadeye: Sending start command [" + start_cmd + "]  in 5 seconds!");
+                PrintMessageToWindow("Sending start command [" + start_cmd + "]  in 5 seconds!");
                 System.Threading.Timer loginDelay = null;
                 loginDelay = new System.Threading.Timer((obj) =>
                 {
@@ -147,7 +147,7 @@ namespace ExamplePlugin
 
         public static void PrintMessageToWindow(string message)
         {
-            try { PluginCore.Chat(message); }
+            try { PluginCore.Chat("[Deadeye] : " + message); }
             catch { }
         }
     }
