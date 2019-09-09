@@ -58,7 +58,7 @@ namespace ExamplePlugin
 
         private static void SendStartLifeTank()
         {
-            PluginCore.Chat("Starting LifeTank (Ctrl+F1 & Ctrl+F4)!");
+            PrintMessageToWindow("Starting LifeTank (Ctrl+F1 & Ctrl+F4)!");
             IntPtr handle = PluginCore.MyHost.Decal.Hwnd;
             IntPtr CTRL_KEY = new IntPtr(0x11);
             uint KEY_DOWN = 0x0100;
@@ -147,7 +147,27 @@ namespace ExamplePlugin
 
         public static void PrintMessageToWindow(string message)
         {
-            try { PluginCore.Chat("[Deadeye] : " + message); }
+            /******* Chat message colors ***********
+                Name        Value       Description
+                cmcGreen	    0	
+                cmcWhite	    2	Local broadcast chat.
+                cmcYellow	    3	
+                cmcDarkYellow	4	
+                cmcMagenta	    5	
+                cmcRed	        6	
+                cmcLightBlue    7	
+                cmcRose	        8	
+                cmcPaleRose	    9	
+                cmcDimWhite	    12	
+                cmcCyan	        13	
+                cmcPaleBlue	    14	SkunkWorks default color.
+                cmcBlue	        17	Spellcasting.
+                cmcCoral	    22	
+             */
+            try
+            {
+                PluginCore.MyCore.Actions.AddChatText("[Deadeye] : " + message, 8);
+            }
             catch { }
         }
     }
