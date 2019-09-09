@@ -43,13 +43,12 @@ namespace ExamplePlugin
 
             if (!String.IsNullOrEmpty(start_cmd))
             {
-                PrintMessageToWindow("Deadeye: Sending start command in 3 seconds!");
+                PrintMessageToWindow("Deadeye: Sending start command [" + start_cmd + "]  in 3 seconds!");
                 System.Threading.Timer loginDelay = null;
                 loginDelay = new System.Threading.Timer((obj) =>
                 {
-                    PrintMessageToWindow("Sending command: [" + start_cmd + "]");
                     PostMsg.SendEnter(PluginCore.MyCore.Decal.Hwnd);
-                    PostMsg.SendCharString(PluginCore.MyCore.Decal.Hwnd, start_cmd);
+                    PostMsg.SendMsg(PluginCore.MyCore.Decal.Hwnd, start_cmd);
                     PostMsg.SendEnter(PluginCore.MyCore.Decal.Hwnd);
                     loginDelay.Dispose();
                 },
