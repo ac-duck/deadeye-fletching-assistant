@@ -56,11 +56,7 @@ namespace ExamplePlugin
             }
             catch
             {
-                try
-                {
-                    Chat("DeadeyeFletcher: Unknown Error during shutdown.");
-                }
-                catch { }
+                
             }
         }
 

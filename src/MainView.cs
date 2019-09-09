@@ -174,16 +174,16 @@ namespace ExamplePlugin
 
             Deadeye.RemoveEventHandlers();
 
-            //bSelectCraftOutput = null;
-            //bSelectCraftInputA = null;
-            //bSelectCraftInputB = null;
+            bSelectCraftOutput = null;
+            bSelectCraftInputA = null;
+            bSelectCraftInputB = null;
 
-            //txtCraftOutput = null;
-            //txtLow = null;
-            //txtCraftInputA = null;
-            //txtCraftInputB = null;
+            txtCraftOutput = null;
+            txtLow = null;
+            txtCraftInputA = null;
+            txtCraftInputB = null;
 
-            //sldLow = null;
+            sldLow = null;
             View.Dispose();
         }
         #endregion Auto-generated view code

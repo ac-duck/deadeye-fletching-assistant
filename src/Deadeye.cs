@@ -43,7 +43,7 @@ namespace ExamplePlugin
 
             if (!String.IsNullOrEmpty(start_cmd))
             {
-                PrintMessageToWindow("Deadeye: Sending start command [" + start_cmd + "]  in 3 seconds!");
+                PrintMessageToWindow("Deadeye: Sending start command [" + start_cmd + "]  in 5 seconds!");
                 System.Threading.Timer loginDelay = null;
                 loginDelay = new System.Threading.Timer((obj) =>
                 {
@@ -52,7 +52,7 @@ namespace ExamplePlugin
                     PostMsg.SendEnter(PluginCore.MyCore.Decal.Hwnd);
                     loginDelay.Dispose();
                 },
-                            null, 3000, System.Threading.Timeout.Infinite);
+                            null, 5000, System.Threading.Timeout.Infinite);
             }
         }       
 
